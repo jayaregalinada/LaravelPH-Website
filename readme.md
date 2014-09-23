@@ -1,5 +1,7 @@
 ## Laravel Philippines Website
 
+[![Build Status](https://travis-ci.org/Laravel-Philippines/LaravelPH-Website.svg?branch=master)](https://travis-ci.org/Laravel-Philippines/LaravelPH-Website)
+
 Facebook Group - https://www.facebook.com/groups/laravelph
 
 Twitter Account - https://twitter.com/LaravelPH
