@@ -80,6 +80,21 @@ class JobControllerTest extends TestCase
         $response = $this->call('GET', route('jobs.show', $job->id));
     }
 
+    public function testShowShouldDecorateTheRequestedJob()
+    {
+        $this->createUser();
+        $job = new Job;
+        $job->title = 'php dev';
+        $job->description = 'should be familiar w/ laravel';
+        $job->user_id = $this->user->id;
+        $job->status = 'published';
+        $job->save();
+
+        $response = $this->call('GET', route('jobs.show', $job->id));
+        $view = $response->original;
+        $this->assertNotInstanceOf('Job', $view['job']);
+    }
+
     public function testStoreShouldRedirectToLoginPageIfUserIsNotAuthenticated()
     {
         Route::enableFilters();
@@ -123,6 +138,38 @@ class JobControllerTest extends TestCase
         $inputs = [];
         $response = $this->call('POST', route('jobs.store', $inputs));
         $this->assertRedirectedToRoute('jobs.create');
+    }
+
+    public function testSearchShouldFilterJobs()
+    {
+        $this->createUser();
+        $job = new Job;
+        $job->title = 'laravel dev';
+        $job->description = 'should be familiar w/ laravel';
+        $job->user_id = $this->user->id;
+        $job->status = 'published';
+        $job->save();
+
+        $job = new Job;
+        $job->title = 'codeigniter dev';
+        $job->description = 'should be familiar w/ codeigniter';
+        $job->user_id = $this->user->id;
+        $job->status = 'published';
+        $job->save();
+
+
+        $inputs = ['q' => 'laravel'];
+        $response = $this->call('GET', route('jobs.search', $inputs));
+        $view = $response->original;
+        $this->assertEquals(1, $view['jobs']->count());
+    }
+
+    public function testSearchShouldPassQueryToTemplate()
+    {
+        $inputs = ['q' => 'laravel'];
+        $response = $this->call('GET', route('jobs.search', $inputs));
+        $view = $response->original;
+        $this->assertEquals($inputs['q'], $view['query']);
     }
 
 }
